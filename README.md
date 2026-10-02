@@ -20,7 +20,7 @@ Work in progress. This section is updated as features land.
 
 - [x] Angular 21 workspace (standalone, zoneless, Vitest, SCSS)
 - [x] Tooling: commitlint, husky, ESLint
-- [ ] Mock GraphQL server
+- [x] Mock GraphQL server
 - [ ] Pokédex table and detail panel
 - [ ] Team store, team list and team builder
 - [ ] Unit tests (store rollback, selector/computed, form validator)
@@ -43,14 +43,33 @@ Work in progress. This section is updated as features land.
 - Node.js `^20.19`, `^22.12` or `>=24`
 - npm 8 or later
 
-### Install and run
+### Install
 
 ```bash
 npm install
+```
+
+### Start the mock server
+
+Teams live in a local GraphQL server generated from [`db.js`](db.js) by
+[json-graphql-server](https://github.com/marmelab/json-graphql-server). In its own terminal:
+
+```bash
+npx json-graphql-server db.js --port 4000
+```
+
+It serves GraphQL at <http://localhost:4000/>, with a GraphiQL explorer at the same URL. Data
+is kept in memory, so created or deleted teams reset when the server restarts.
+
+### Start the app
+
+In a second terminal:
+
+```bash
 npm start
 ```
 
-Then open <http://localhost:4200>.
+Then open <http://localhost:4200>. Pokémon data needs internet access to reach PokéAPI.
 
 ## Scripts
 
