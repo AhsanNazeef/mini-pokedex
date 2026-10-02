@@ -5,11 +5,14 @@ import {
   computed,
   effect,
   inject,
+  signal,
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { EmptyStateComponent } from "../common/components/empty-state/empty-state.component";
 import { ErrorStateComponent } from "../common/components/error-state/error-state.component";
+import { CustomButtonComponent } from "../common/components/custom-button/custom-button.component";
 import { HeaderComponent } from "../common/components/header/header.component";
+import { ModalDialogComponent } from "../common/components/modal-dialog/modal-dialog.component";
 import { SkeletonComponent } from "../common/components/skeleton/skeleton.component";
 import {
   CacheService,
@@ -19,6 +22,7 @@ import { ToastService } from "../common/services/toast.service";
 import { LoadStatus } from "../common/models/load-status.model";
 import { PokemonSelectors } from "../pokedex/state/pokemon.selectors";
 import { PokemonStore } from "../pokedex/state/pokemon.store";
+import { TeamBuilderFormComponent } from "./components/team-builder-form/team-builder-form.component";
 import {
   TeamCardComponent,
   TeamMember,
@@ -27,7 +31,7 @@ import {
   DEFAULT_SKELETON_TEAM_CARDS,
   MAX_SKELETON_TEAM_CARDS,
 } from "./constants/team.constants";
-import { Team } from "./models/team.model";
+import { CreateTeamInput, Team } from "./models/team.model";
 import { TeamStore } from "./state/team.store";
 
 interface TeamView {
@@ -40,10 +44,13 @@ interface TeamView {
   selector: "app-teams-page",
   standalone: true,
   imports: [
+    CustomButtonComponent,
     EmptyStateComponent,
     ErrorStateComponent,
     HeaderComponent,
+    ModalDialogComponent,
     SkeletonComponent,
+    TeamBuilderFormComponent,
     TeamCardComponent,
   ],
   templateUrl: "./teams.component.html",
@@ -74,6 +81,7 @@ export class TeamsPage implements OnInit {
   );
   readonly skeletonSlots = [1, 2, 3, 4, 5, 6];
   readonly skeletonBadges = [1, 2, 3, 4, 5, 6, 7];
+  readonly isFormOpen = signal(false);
 
   /**
    * Cards need teams *and* the Pokédex cache, so the page keeps showing
@@ -146,5 +154,12 @@ export class TeamsPage implements OnInit {
 
   onDeleteTeam(id: string): void {
     this.teamStore.deleteTeam(id);
+  }
+
+  onCreateTeam(input: CreateTeamInput): void {
+    // The store adds the team optimistically and rolls back with a toast.
+    this.teamStore.createTeam(input);
+    this.isFormOpen.set(false);
+    this.toastService.success(`"${input.name}" added to your teams.`);
   }
 }

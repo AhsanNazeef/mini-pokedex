@@ -6,6 +6,18 @@
   margin: 0 auto;
   padding: 8px 16px 48px;
 
+  &__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    app-header {
+      flex: 1;
+    }
+  }
+
   &__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

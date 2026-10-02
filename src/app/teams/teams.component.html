@@ -1,5 +1,24 @@
 <main class="teams-page">
-  <app-header title="Teams" />
+  <div class="teams-page__top">
+    <app-header title="Teams" />
+    <app-custom-button (clicked)="isFormOpen.set(true)">
+      New team
+    </app-custom-button>
+  </div>
+
+  <!-- In a dialog so building a team never shifts the list behind it. -->
+  <app-modal-dialog
+    title="New team"
+    [open]="isFormOpen()"
+    (closed)="isFormOpen.set(false)"
+  >
+    @if (isFormOpen()) {
+      <app-team-builder-form
+        (created)="onCreateTeam($event)"
+        (cancelled)="isFormOpen.set(false)"
+      />
+    }
+  </app-modal-dialog>
 
   @switch (status()) {
     @case ("error") {
