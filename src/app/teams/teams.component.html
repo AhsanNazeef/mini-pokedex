@@ -1,0 +1,64 @@
+<main class="teams-page">
+  <app-header title="Teams" />
+
+  @switch (status()) {
+    @case ("error") {
+      <app-error-state
+        title="Couldn't load your teams"
+        [message]="errorMessage() ?? ''"
+        (retry)="onRetry()"
+      />
+    }
+
+    @case ("success") {
+      @if (teamViews().length) {
+        <ul class="teams-page__list">
+          @for (view of teamViews(); track view.team.id) {
+            <li>
+              <app-team-card
+                [team]="view.team"
+                [members]="view.members"
+                [pending]="view.pending"
+                (deleteTeam)="onDeleteTeam($event)"
+              />
+            </li>
+          }
+        </ul>
+      } @else {
+        <app-empty-state
+          title="No teams yet"
+          message="Build your first team to see it here."
+          icon="check"
+        />
+      }
+    }
+
+    @default {
+      <p class="visually-hidden" role="status">Loading teams…</p>
+      <ul class="teams-page__list" aria-hidden="true">
+        @for (card of skeletonCards; track card) {
+          <li class="teams-page__skeleton-card">
+            <div class="teams-page__skeleton-header">
+              <app-skeleton width="160px" height="22px" />
+              <app-skeleton width="220px" height="17px" />
+            </div>
+            <div class="teams-page__skeleton-members">
+              @for (slot of skeletonSlots; track slot) {
+                <div class="teams-page__skeleton-member">
+                  <app-skeleton width="48px" height="48px" radius="50%" />
+                  <app-skeleton width="40px" height="0.6875rem" />
+                </div>
+              }
+            </div>
+            <div class="teams-page__skeleton-badges">
+              @for (badge of skeletonBadges; track badge) {
+                <app-skeleton width="62px" height="22px" radius="999px" />
+              }
+            </div>
+            <app-skeleton width="110px" height="22px" />
+          </li>
+        }
+      </ul>
+    }
+  }
+</main>

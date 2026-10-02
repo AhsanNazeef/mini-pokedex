@@ -1,0 +1,69 @@
+<article
+  class="team-card"
+  [class.team-card--pending]="pending()"
+  [attr.aria-busy]="pending() || null"
+>
+  <header class="team-card__header">
+    <div class="team-card__heading">
+      <h2 class="team-card__name">{{ team().name }}</h2>
+      <p class="team-card__meta">
+        {{ members().length }} Pokémon
+        @if (team().trainerName) {
+          · {{ team().trainerName }}
+        }
+        @if (team().createdAt) {
+          · {{ team().createdAt | date: "mediumDate" }}
+        }
+      </p>
+    </div>
+    <button
+      type="button"
+      class="team-card__delete"
+      [attr.aria-label]="'Delete team ' + team().name"
+      [disabled]="pending()"
+      (click)="deleteTeam.emit(team().id)"
+    >
+      <img
+        src="assets/icons/ic_close.svg"
+        width="16"
+        height="16"
+        alt=""
+        aria-hidden="true"
+      />
+    </button>
+  </header>
+
+  <ul class="team-card__members">
+    @for (member of members(); track member.id) {
+      <li class="team-card__member">
+        <app-avatar
+          variant="sprite"
+          [imageUrl]="member.pokemon?.spriteUrl ?? null"
+          [size]="48"
+          [fallbackInitials]="'#' + member.id"
+        />
+        <span class="team-card__member-name">
+          @if (member.pokemon; as pokemon) {
+            {{ pokemon.name | pokemonName }}
+          } @else {
+            #{{ member.id }}
+          }
+        </span>
+      </li>
+    }
+  </ul>
+
+  <!-- Types and total are separate rows so they line up across cards. -->
+  <div class="team-card__types">
+    @for (entry of typeSpread(); track entry.type) {
+      <app-type-badge [type]="entry.type" />
+    }
+  </div>
+
+  <p class="team-card__total">
+    @if (totalStats() > 0) {
+      <span class="team-card__total-label">Total stats</span>
+      <span class="team-card__total-value">{{ totalStats() }}</span>
+    }
+  </p>
+</article>
