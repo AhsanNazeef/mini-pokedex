@@ -1,0 +1,172 @@
+<button
+  type="button"
+  class="panel-backdrop"
+  [class.panel-backdrop--visible]="open()"
+  tabindex="-1"
+  aria-label="Close details"
+  (click)="close()"
+></button>
+
+<div
+  class="panel"
+  [class.panel--open]="open()"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="titleId"
+  [attr.inert]="open() ? null : ''"
+>
+  <div class="panel__close-row">
+    <button
+      #closeButton
+      type="button"
+      class="panel__close-btn"
+      aria-label="Back"
+      (click)="close()"
+    >
+      <img
+        src="assets/icons/ic_arrow_left.svg"
+        width="24"
+        height="24"
+        alt=""
+        aria-hidden="true"
+      />
+    </button>
+  </div>
+
+  <div class="panel__content">
+    @if (pokemon(); as pokemon) {
+      <header class="panel__hero">
+        <app-avatar
+          variant="sprite"
+          loading="eager"
+          [imageUrl]="pokemon.spriteUrl"
+          [size]="104"
+          [fallbackInitials]="pokemon.name.charAt(0).toUpperCase()"
+        />
+        <div class="panel__identity">
+          <p class="panel__dex">{{ pokemon.id | dexNumber }}</p>
+          <h2 class="panel__title" [id]="titleId">
+            {{ pokemon.name | pokemonName }}
+          </h2>
+          <div class="panel__types">
+            @for (type of pokemon.types; track type) {
+              <app-type-badge [type]="type" />
+            }
+          </div>
+        </div>
+      </header>
+
+      <dl class="panel__facts">
+        <div class="panel__fact">
+          <dt>Height</dt>
+          <dd>{{ pokemon.height / 10 | number: "1.1-1" }} m</dd>
+        </div>
+        <div class="panel__fact">
+          <dt>Weight</dt>
+          <dd>{{ pokemon.weight / 10 | number: "1.1-1" }} kg</dd>
+        </div>
+        <div class="panel__fact">
+          <dt>Total</dt>
+          <dd>{{ pokemon.total }}</dd>
+        </div>
+      </dl>
+
+      <section class="panel__section" aria-labelledby="pokemon-detail-stats">
+        <h3 class="panel__section-title" id="pokemon-detail-stats">
+          Base stats
+        </h3>
+        <app-stat-radar-chart
+          [stats]="pokemon.stats"
+          [color]="chartColor()"
+          [name]="pokemon.name | pokemonName"
+          [label]="(pokemon.name | pokemonName) + ' base stats radar chart'"
+        />
+        <ul class="panel__stats">
+          @for (stat of statKeys; track stat) {
+            <li class="panel__stat">
+              <span class="panel__stat-label">{{ statLabels[stat] }}</span>
+              <span class="panel__stat-value">{{ pokemon.stats[stat] }}</span>
+              <span class="panel__stat-bar" aria-hidden="true">
+                <span
+                  class="panel__stat-fill"
+                  [style.width.%]="(pokemon.stats[stat] / maxBaseStat) * 100"
+                  [style.background-color]="chartColor()"
+                ></span>
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section
+        class="panel__section"
+        aria-labelledby="pokemon-detail-abilities"
+        [attr.aria-busy]="isLoadingDetails()"
+      >
+        <h3 class="panel__section-title" id="pokemon-detail-abilities">
+          Abilities
+        </h3>
+        @switch (details().status) {
+          @case ("success") {
+            @if (abilities().length) {
+              <ul class="panel__abilities">
+                @for (ability of abilities(); track ability.name) {
+                  <li class="panel__ability">
+                    <div class="panel__ability-header">
+                      <span class="panel__ability-name">
+                        {{ ability.name | pokemonName }}
+                      </span>
+                      @if (ability.isHidden) {
+                        <span class="panel__hidden-tag">Hidden</span>
+                      }
+                    </div>
+                    <p class="panel__ability-effect">
+                      {{ ability.shortEffect ?? "No description available." }}
+                    </p>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <app-empty-state
+                title="No abilities recorded"
+                message="PokéAPI lists no abilities for this Pokémon."
+                [compact]="true"
+              />
+            }
+          }
+          @case ("error") {
+            <app-error-state
+              [compact]="true"
+              [message]="details().error ?? ''"
+              (retry)="retryDetails()"
+            />
+          }
+          @default {
+            <p class="visually-hidden" role="status">Loading abilities…</p>
+            @for (row of [1, 2]; track row) {
+              <div class="panel__ability" aria-hidden="true">
+                <app-skeleton width="120px" />
+                <app-skeleton height="0.8rem" />
+                <app-skeleton width="70%" height="0.8rem" />
+              </div>
+            }
+          }
+        }
+      </section>
+    } @else if (details().status === "error") {
+      <app-error-state
+        title="Couldn't load this Pokémon"
+        [message]="details().error ?? ''"
+        (retry)="retryDetails()"
+      />
+    } @else if (pokemonId() !== null) {
+      <div class="panel__hero" aria-hidden="true">
+        <app-skeleton width="104px" height="104px" radius="50%" />
+        <div class="panel__identity">
+          <app-skeleton width="56px" />
+          <app-skeleton width="160px" height="1.5rem" />
+        </div>
+      </div>
+    }
+  </div>
+</div>

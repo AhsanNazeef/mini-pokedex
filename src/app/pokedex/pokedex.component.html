@@ -1,4 +1,5 @@
-<main class="pokedex-page">
+<!-- Inert while the detail dialog is open, so focus and clicks stay in it. -->
+<main class="pokedex-page" [attr.inert]="isPanelOpen() ? '' : null">
   <app-header
     title="Pokédex"
     [showSearch]="true"
@@ -48,3 +49,9 @@
     />
   }
 </main>
+
+<app-pokemon-detail-panel
+  [pokemonId]="selectedPokemonId()"
+  [open]="isPanelOpen()"
+  (closed)="onClosePanel()"
+/>

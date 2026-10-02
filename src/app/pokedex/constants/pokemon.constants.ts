@@ -5,6 +5,9 @@ export const POKEDEX_SIZE = 1025;
 
 export const POKEMON_SEARCH_DEBOUNCE_MS = 300;
 
+// Highest base stat any Pokémon has (Blissey's HP); the radar and stat bars scale to it.
+export const MAX_BASE_STAT = 255;
+
 export const PAGE_SIZE_OPTIONS: readonly PageSize[] = [10, 25, 50];
 export const DEFAULT_PAGE_SIZE: PageSize = 10;
 

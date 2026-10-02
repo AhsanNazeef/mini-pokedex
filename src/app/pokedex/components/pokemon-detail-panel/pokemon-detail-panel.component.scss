@@ -1,0 +1,251 @@
+@use "../../../common/styles/shared" as *;
+
+// Fixed layer above the page; only the backdrop and panel take pointer events.
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.panel-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-surface-overlay);
+  backdrop-filter: var(--backdrop-blur);
+  opacity: 0;
+  cursor: default;
+  transition: opacity 0.25s ease;
+
+  &--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.panel {
+  @include custom-scrollbar;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--panel-width), 100vw);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: -16px 0 48px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+  transform: translateX(100%);
+  visibility: hidden;
+  // Stay visible while sliding out, then hide.
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 0.3s;
+
+  &--open {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s;
+  }
+
+  &__close-row {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    padding: 12px;
+    background: var(--color-surface);
+  }
+
+  &__close-btn {
+    display: inline-flex;
+    padding: 8px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 24px 32px;
+  }
+
+  &__hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__dex {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  &__types {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 0;
+  }
+
+  &__fact {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+
+    dt {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+    }
+
+    dd {
+      margin: 4px 0 0;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__section-title {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__stat {
+    display: grid;
+    grid-template-columns: 64px 36px 1fr;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+  }
+
+  &__stat-label {
+    color: var(--color-text-muted);
+  }
+
+  &__stat-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__stat-bar {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &__stat-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  &__abilities {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__ability {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+  }
+
+  &__ability-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__ability-name {
+    font-weight: 600;
+  }
+
+  &__hidden-tag {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__ability-effect {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+}

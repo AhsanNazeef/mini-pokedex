@@ -16,6 +16,7 @@ import { HeaderComponent } from "../common/components/header/header.component";
 import { PaginationComponent } from "../common/components/pagination/pagination.component";
 import { ImagePreloadService } from "../common/services/image-preload.service";
 import { toTitleCase } from "../common/utils/string.util";
+import { PokemonDetailPanelComponent } from "./components/pokemon-detail-panel/pokemon-detail-panel.component";
 import { PokemonTableComponent } from "./components/pokemon-table/pokemon-table.component";
 import { PAGE_SIZE_OPTIONS } from "./constants/pokemon.constants";
 import { PageSize, Pokemon, PokemonSortKey } from "./models/pokemon.model";
@@ -29,6 +30,7 @@ import { PokemonStore } from "./state/pokemon.store";
     CustomSelectComponent,
     HeaderComponent,
     PaginationComponent,
+    PokemonDetailPanelComponent,
     PokemonTableComponent,
   ],
   templateUrl: "./pokedex.component.html",
@@ -117,5 +119,11 @@ export class PokedexPage implements OnInit {
   onSelectPokemon(pokemon: Pokemon): void {
     this.selectedPokemonId.set(pokemon.id);
     this.isPanelOpen.set(true);
+  }
+
+  // The selection is kept so the panel can slide out with its content and the
+  // chart can animate from this Pokémon to the next one opened.
+  onClosePanel(): void {
+    this.isPanelOpen.set(false);
   }
 }
