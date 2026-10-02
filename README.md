@@ -21,7 +21,7 @@ Work in progress. This section is updated as features land.
 - [x] Angular 21 workspace (standalone, zoneless, Vitest, SCSS)
 - [x] Tooling: commitlint, husky, ESLint
 - [x] Mock GraphQL server
-- [ ] Pokédex table and detail panel
+- [x] Pokédex table and detail panel
 - [ ] Team store, team list and team builder
 - [ ] Unit tests (store rollback, selector/computed, form validator)
 
