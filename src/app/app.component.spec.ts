@@ -1,24 +1,65 @@
+import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { provideRouter } from "@angular/router";
+import { Router, provideRouter } from "@angular/router";
 import { AppComponent } from "./app.component";
 
+@Component({ template: "<p>Home page</p>" })
+class HomeStubPage {}
+
 describe("AppComponent", () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  let failNextLoad: boolean;
+
+  beforeEach(() => {
+    failNextLoad = false;
+    TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([])],
-    }).compileComponents();
+      providers: [
+        provideRouter([
+          { path: "", component: HomeStubPage },
+          {
+            path: "lazy",
+            loadComponent: () =>
+              failNextLoad
+                ? Promise.reject(new Error("ChunkLoadError"))
+                : Promise.resolve(HomeStubPage),
+          },
+        ]),
+      ],
+    });
   });
 
-  it("should create the app", () => {
+  it("shows a loader until the first page activates", async () => {
     const fixture = TestBed.createComponent(AppComponent);
-    expect(fixture.componentInstance).toBeTruthy();
-  });
+    const element = fixture.nativeElement as HTMLElement;
+    fixture.detectChanges();
+    expect(element.querySelector('[role="status"]')?.textContent).toContain(
+      "Loading",
+    );
 
-  it("should render the router outlet", async () => {
-    const fixture = TestBed.createComponent(AppComponent);
+    await TestBed.inject(Router).navigateByUrl("/");
     await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector("router-outlet")).not.toBeNull();
+
+    expect(element.querySelector('[role="status"]')).toBeNull();
+    expect(element.textContent).toContain("Home page");
+  });
+
+  it("offers Retry when a lazy page fails to download", async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const element = fixture.nativeElement as HTMLElement;
+    const router = TestBed.inject(Router);
+
+    failNextLoad = true;
+    await router.navigateByUrl("/lazy").catch(() => undefined);
+    await fixture.whenStable();
+
+    const alert = element.querySelector('[role="alert"]');
+    expect(alert?.textContent).toContain("Couldn't load this page");
+
+    failNextLoad = false;
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')?.click();
+    await fixture.whenStable();
+
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(router.url).toBe("/lazy");
   });
 });

@@ -1,1 +1,30 @@
-<router-outlet />
+@if (isNavigating()) {
+  @if (hasPage()) {
+    <div
+      class="app-shell__progress"
+      role="progressbar"
+      aria-label="Loading page"
+    ></div>
+  } @else {
+    <div class="app-shell__status" role="status">
+      <span class="app-shell__spinner" aria-hidden="true"></span>
+      Loading…
+    </div>
+  }
+}
+
+@if (failedUrl(); as url) {
+  <div class="app-shell__error" [class.app-shell__error--banner]="hasPage()">
+    <app-error-state
+      title="Couldn't load this page"
+      message="Check your connection and try again."
+      [compact]="hasPage()"
+      (retry)="retryNavigation(url)"
+    />
+  </div>
+}
+
+<router-outlet
+  (activate)="hasPage.set(true)"
+  (deactivate)="hasPage.set(false)"
+/>

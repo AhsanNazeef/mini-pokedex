@@ -5,15 +5,61 @@
     <title>Mini Pokédex</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- Open connections early: PokéAPI data and the sprite CDN. -->
+    <link rel="preconnect" href="https://beta.pokeapi.co" crossorigin />
+    <link rel="preconnect" href="https://raw.githubusercontent.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-blocking font load: falls back to system-ui until Inter arrives. -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media = 'all'"
     />
+    <!-- Shown while the app bundle downloads; Angular replaces it on bootstrap. -->
+    <style>
+      html {
+        background-color: #111212;
+      }
+      body {
+        margin: 0;
+        background-color: #131515;
+      }
+      .app-boot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: 100vh;
+        color: rgba(255, 255, 255, 0.6);
+        font:
+          14px system-ui,
+          sans-serif;
+      }
+      .app-boot__spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: app-boot-spin 0.8s linear infinite;
+      }
+      @keyframes app-boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <div class="app-boot" role="status">
+        <span class="app-boot__spinner" aria-hidden="true"></span>
+        Loading Mini Pokédex…
+      </div>
+    </app-root>
   </body>
 </html>
