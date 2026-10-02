@@ -1,0 +1,31 @@
+<dialog
+  #dialog
+  class="modal"
+  [attr.aria-labelledby]="title() + '-modal-title'"
+  (close)="onClose()"
+>
+  <div class="modal__panel">
+    <header class="modal__header">
+      <h2 class="modal__title" [id]="title() + '-modal-title'">
+        {{ title() }}
+      </h2>
+      <button
+        type="button"
+        class="modal__close"
+        aria-label="Close dialog"
+        (click)="closed.emit()"
+      >
+        <img
+          src="assets/icons/ic_close.svg"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+    </header>
+    <div class="modal__body">
+      <ng-content />
+    </div>
+  </div>
+</dialog>
