@@ -1,0 +1,17 @@
+.type-badge {
+  display: inline-block;
+  min-width: 60px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #131515;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+
+  &--light-text {
+    color: #ffffff;
+  }
+}

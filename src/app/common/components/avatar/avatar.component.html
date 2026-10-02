@@ -1,0 +1,23 @@
+<div
+  class="avatar"
+  [class.avatar--sprite]="variant() === 'sprite'"
+  [class.avatar--loading]="isLoading()"
+  [style.width.px]="size()"
+  [style.height.px]="size()"
+>
+  @if (imageUrl() && !hasLoadError()) {
+    <img
+      [src]="imageUrl()"
+      class="avatar__image"
+      [class.avatar__image--loaded]="isLoaded()"
+      [loading]="loading()"
+      decoding="async"
+      alt=""
+      aria-hidden="true"
+      (load)="onImageLoad()"
+      (error)="onImageError()"
+    />
+  } @else {
+    <div class="avatar__fallback">{{ fallbackInitials() }}</div>
+  }
+</div>

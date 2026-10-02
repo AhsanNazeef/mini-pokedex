@@ -2,9 +2,11 @@
 
 :host {
   display: block;
+  max-width: 100%;
 }
 
 .skeleton {
   @extend %sk-shimmer;
   display: block;
+  width: 100%;
 }

@@ -1,0 +1,49 @@
+<nav class="pagination" aria-label="Pagination">
+  <app-custom-select
+    label="Rows per page"
+    inputId="page-size"
+    [options]="sizeOptions()"
+    [value]="sizeValue()"
+    [disabled]="loading()"
+    (valueChange)="onPageSizeChange($event)"
+  />
+
+  <p class="pagination__range" aria-live="polite">
+    @if (loading()) {
+      <app-skeleton width="96px" />
+    } @else if (totalItems() === 0) {
+      No results
+    } @else {
+      {{ rangeStart() }}–{{ rangeEnd() }} of {{ totalItems() }}
+    }
+  </p>
+
+  <!-- Nothing to page through when there are no results. -->
+  @if (loading() || totalItems() > 0) {
+    <div class="pagination__controls">
+      <app-custom-button
+        variant="secondary"
+        ariaLabel="Previous page"
+        [disabled]="loading() || !hasPrevious()"
+        (clicked)="pageChange.emit(pageIndex() - 1)"
+      >
+        Prev
+      </app-custom-button>
+      <span class="pagination__page">
+        @if (loading()) {
+          <app-skeleton width="88px" />
+        } @else {
+          Page {{ pageIndex() + 1 }} of {{ pageCount() }}
+        }
+      </span>
+      <app-custom-button
+        variant="secondary"
+        ariaLabel="Next page"
+        [disabled]="loading() || !hasNext()"
+        (clicked)="pageChange.emit(pageIndex() + 1)"
+      >
+        Next
+      </app-custom-button>
+    </div>
+  }
+</nav>

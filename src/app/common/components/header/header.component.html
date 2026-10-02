@@ -1,0 +1,58 @@
+<header class="header">
+  <div class="header__title-wrapper">
+    @if (backUrl()) {
+      <a class="header__back-btn" [href]="backUrl()" aria-label="Go back">
+        <img
+          src="assets/icons/ic_arrow_left.svg"
+          width="18"
+          height="18"
+          alt=""
+          aria-hidden="true"
+        />
+      </a>
+    }
+    <h1 class="header__title">{{ title() }}</h1>
+  </div>
+
+  @if (showSearch()) {
+    <div class="header__search">
+      <div class="header__search-content">
+        <img
+          src="assets/icons/ic_search.svg"
+          width="18"
+          height="18"
+          alt=""
+          aria-hidden="true"
+          class="header__search-icon"
+        />
+        <input
+          #searchField
+          class="header__search-field"
+          type="text"
+          autocomplete="off"
+          [value]="searchQuery()"
+          [placeholder]="searchPlaceholder()"
+          [attr.aria-label]="searchPlaceholder()"
+          [disabled]="searchDisabled()"
+          (input)="onSearchInput($event)"
+        />
+        @if (searchQuery() && !searchDisabled()) {
+          <button
+            type="button"
+            class="header__clear-btn"
+            aria-label="Clear search"
+            (click)="onClearSearch()"
+          >
+            <img
+              src="assets/icons/ic_close.svg"
+              width="16"
+              height="16"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+        }
+      </div>
+    </div>
+  }
+</header>

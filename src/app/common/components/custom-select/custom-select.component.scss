@@ -1,0 +1,110 @@
+@use "../../styles/shared" as *;
+
+.custom-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &__label {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  &__control {
+    position: relative;
+  }
+
+  &__trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 120px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__icon {
+    transition: transform 0.15s ease;
+  }
+
+  &--open &__trigger {
+    border-color: var(--color-primary);
+  }
+
+  &--open &__icon {
+    transform: rotate(180deg);
+  }
+
+  &__listbox {
+    @include custom-scrollbar;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+    &:focus {
+      outline: none;
+    }
+
+    &--up {
+      top: auto;
+      bottom: calc(100% + 4px);
+    }
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 36px;
+    padding: 0 8px 0 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &[aria-selected="true"] {
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+  }
+}

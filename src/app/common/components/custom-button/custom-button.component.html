@@ -4,6 +4,7 @@
   [type]="type()"
   [disabled]="disabled() || isLoading()"
   [attr.aria-busy]="isLoading() || null"
+  [attr.aria-label]="ariaLabel()"
   (click)="onClick()"
 >
   @if (isLoading()) {

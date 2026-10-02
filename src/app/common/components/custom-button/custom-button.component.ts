@@ -17,6 +17,7 @@ export class CustomButtonComponent {
   readonly type = input<"button" | "submit">("button");
   readonly disabled = input(false);
   readonly isLoading = input(false);
+  readonly ariaLabel = input<string | null>(null);
   readonly clicked = output<void>();
 
   onClick(): void {
