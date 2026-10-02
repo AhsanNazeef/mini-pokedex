@@ -96,8 +96,13 @@ export function paginate<T>(
 export class PokemonSelectors {
   private readonly store = inject(PokemonStore);
 
+  /** Load state of the Pokédex itself, for the table's four UI states. */
   readonly status$ = this.store.select((state) => state.status);
+
+  /** User-facing message for a failed Pokédex load, or `null`. */
   readonly error$ = this.store.select((state) => state.error);
+
+  /** Current search text, type filter, sort and page. */
   readonly query$ = this.store.select((state) => state.query);
 
   /** Every cached Pokémon in National Pokédex order. */
