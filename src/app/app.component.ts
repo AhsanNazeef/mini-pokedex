@@ -17,7 +17,9 @@ import {
   RouterOutlet,
 } from "@angular/router";
 import { filter, map } from "rxjs";
+import { AppNavComponent } from "./common/components/app-nav/app-nav.component";
 import { ErrorStateComponent } from "./common/components/error-state/error-state.component";
+import { ToastHostComponent } from "./common/components/toast-host/toast-host.component";
 import { ICON_URLS } from "./common/constants/icon.constants";
 import { ImagePreloadService } from "./common/services/image-preload.service";
 
@@ -42,7 +44,12 @@ function toNavigationState(event: RouterEvent): NavigationState | null {
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [ErrorStateComponent, RouterOutlet],
+  imports: [
+    AppNavComponent,
+    ErrorStateComponent,
+    RouterOutlet,
+    ToastHostComponent,
+  ],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

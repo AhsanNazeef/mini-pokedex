@@ -110,6 +110,10 @@ export class PokemonSelectors {
     shareReplay(1),
   );
 
+  /** Cached Pokémon keyed by National Pokédex number, for id lookups. */
+  readonly entities$: Observable<Readonly<Record<number, Pokemon>>> =
+    this.store.select((state) => state.entities);
+
   /** Distinct types across the cache, alphabetically, for the type filter. */
   readonly types$: Observable<string[]> = this.allPokemon$.pipe(
     map((pokemon) => [...new Set(pokemon.flatMap((p) => p.types))].sort()),

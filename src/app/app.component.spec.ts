@@ -52,14 +52,18 @@ describe("AppComponent", () => {
     await router.navigateByUrl("/lazy").catch(() => undefined);
     await fixture.whenStable();
 
-    const alert = element.querySelector('[role="alert"]');
+    const alert = element.querySelector('.app-shell__error [role="alert"]');
     expect(alert?.textContent).toContain("Couldn't load this page");
 
     failNextLoad = false;
-    element.querySelector<HTMLButtonElement>('[role="alert"] button')?.click();
+    element
+      .querySelector<HTMLButtonElement>(
+        '.app-shell__error [role="alert"] button',
+      )
+      ?.click();
     await fixture.whenStable();
 
-    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(element.querySelector(".app-shell__error")).toBeNull();
     expect(router.url).toBe("/lazy");
   });
 });

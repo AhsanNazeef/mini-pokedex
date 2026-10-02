@@ -1,3 +1,5 @@
+<app-nav />
+
 @if (isNavigating()) {
   @if (hasPage()) {
     <div
@@ -28,3 +30,5 @@
   (activate)="hasPage.set(true)"
   (deactivate)="hasPage.set(false)"
 />
+
+<app-toast-host />
