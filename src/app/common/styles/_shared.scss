@@ -1,0 +1,42 @@
+// src/app/common/styles/_shared.scss
+
+// Skeleton shimmer animation
+%sk-shimmer {
+  animation: sk-shimmer 1.6s infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Scrollbar styling
+@mixin custom-scrollbar($color: rgba(255, 255, 255, 0.2)) {
+  scrollbar-width: thin;
+  scrollbar-color: $color transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color;
+    border-radius: 4px;
+  }
+}
