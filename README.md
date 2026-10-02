@@ -23,8 +23,8 @@ Work in progress. This section is updated as features land.
 - [x] Mock GraphQL server
 - [x] Pokédex table and detail panel
 - [x] Team store and team list
-- [ ] Team builder form
-- [ ] Unit tests (store rollback, selector/computed, form validator)
+- [x] Team builder form
+- [x] Unit tests (store rollback, selector/computed, form validator)
 
 ## Tech stack
 
