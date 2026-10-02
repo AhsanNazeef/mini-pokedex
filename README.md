@@ -19,7 +19,7 @@ teams are stored in a local mock GraphQL server.
 Work in progress. This section is updated as features land.
 
 - [x] Angular 21 workspace (standalone, zoneless, Vitest, SCSS)
-- [ ] Tooling: commitlint, husky, ESLint
+- [x] Tooling: commitlint, husky, ESLint
 - [ ] Mock GraphQL server
 - [ ] Pokédex table and detail panel
 - [ ] Team store, team list and team builder
@@ -59,11 +59,26 @@ Then open <http://localhost:4200>.
 | `npm start`            | Start the dev server on port 4200         |
 | `npm run build`        | Production build into `dist/mini-pokedex` |
 | `npm test`             | Run unit tests with Vitest                |
+| `npm run lint`         | Lint TypeScript and templates with ESLint |
 | `npm run format`       | Format `src/` with Prettier               |
 | `npm run format:check` | Check formatting without writing changes  |
 
 The Angular CLI is installed locally, so use `npx ng <command>` (or the scripts above) rather
 than a global `ng`.
+
+## Commit messages
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/) and are checked by
+commitlint in a husky `commit-msg` hook (installed automatically by `npm install`):
+
+```
+<type>(<scope>): <subject>
+```
+
+- **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`, `style`
+- **Scopes:** `core`, `common`, `cache`, `pokedex`, `teams`, `deps`, `readme`, `mock`
+- **Subject:** lowercase, imperative mood ("add", not "added"), no trailing period, header
+  ≤ 100 characters
 
 ## Project structure
 
