@@ -1,0 +1,34 @@
+<!-- Assertive: these report a failed action the viewer just triggered. -->
+<div class="toast-host" role="alert" aria-live="assertive">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast" [class.toast--error]="toast.tone === 'error'">
+      <img
+        class="toast__icon"
+        [src]="
+          toast.tone === 'error'
+            ? 'assets/icons/ic_alert.svg'
+            : 'assets/icons/ic_check.svg'
+        "
+        width="18"
+        height="18"
+        alt=""
+        aria-hidden="true"
+      />
+      <p class="toast__message">{{ toast.message }}</p>
+      <button
+        type="button"
+        class="toast__dismiss"
+        aria-label="Dismiss notification"
+        (click)="dismiss(toast.id)"
+      >
+        <img
+          src="assets/icons/ic_close.svg"
+          width="14"
+          height="14"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  }
+</div>
