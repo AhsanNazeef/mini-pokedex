@@ -2,7 +2,11 @@
 
 .pokemon-table {
   @include custom-scrollbar;
+  // Horizontal only. Without an explicit `hidden`, `auto` on one axis makes
+  // the other scrollable too, and sub-pixel row heights left the box
+  // draggable by a stray pixel.
   overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-2);
@@ -32,10 +36,12 @@
     width: 180px;
   }
 
+  // Lifted a shade above the rows so the header reads as a separate band.
   th {
     padding: 0 12px;
     height: 44px;
     border-bottom: 1px solid var(--color-border);
+    background: #252929;
     color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
@@ -57,11 +63,15 @@
   &__row {
     height: 56px;
 
+    &:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
     &--interactive {
       cursor: pointer;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.05);
       }
 
       &:focus-visible {
