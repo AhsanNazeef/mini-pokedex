@@ -22,7 +22,8 @@ Work in progress. This section is updated as features land.
 - [x] Tooling: commitlint, husky, ESLint
 - [x] Mock GraphQL server
 - [x] Pokédex table and detail panel
-- [ ] Team store, team list and team builder
+- [x] Team store and team list
+- [ ] Team builder form
 - [ ] Unit tests (store rollback, selector/computed, form validator)
 
 ## Tech stack
