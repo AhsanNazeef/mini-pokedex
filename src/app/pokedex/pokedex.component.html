@@ -1,0 +1,50 @@
+<main class="pokedex-page">
+  <app-header
+    title="Pokédex"
+    [showSearch]="true"
+    searchPlaceholder="Search Pokémon by name"
+    [searchQuery]="query().search"
+    (searchChange)="onSearchChange($event)"
+    (clearSearch)="onSearchChange('')"
+  />
+
+  <div class="pokedex-page__toolbar">
+    <app-custom-select
+      label="Type"
+      inputId="type-filter"
+      [options]="typeOptions()"
+      [value]="query().type ?? ''"
+      [disabled]="!isReady()"
+      (valueChange)="onTypeChange($event)"
+    />
+  </div>
+
+  <app-pokemon-table
+    [pokemon]="page().items"
+    [status]="status()"
+    [errorMessage]="errorMessage()"
+    [sort]="query().sort"
+    [skeletonRowCount]="query().page.size"
+    [selectedId]="selectedPokemonId()"
+    [searchTerm]="searchTerm()"
+    [typeFilter]="query().type"
+    (sortChange)="onSortChange($event)"
+    (rowSelect)="onSelectPokemon($event)"
+    (retry)="onRetry()"
+    (clearFilters)="onClearFilters()"
+  />
+
+  <!-- On a load error the table shows the message and Retry; nothing to page. -->
+  @if (status() !== "error") {
+    <app-pagination
+      [pageIndex]="page().index"
+      [pageCount]="page().pageCount"
+      [pageSize]="query().page.size"
+      [totalItems]="page().totalItems"
+      [pageSizeOptions]="pageSizeOptions"
+      [loading]="!isReady()"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    />
+  }
+</main>

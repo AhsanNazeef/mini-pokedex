@@ -1,0 +1,158 @@
+<div class="pokemon-table" [attr.aria-busy]="viewState() === 'loading'">
+  @if (viewState() === "loading") {
+    <p class="visually-hidden" role="status">Loading Pokémon…</p>
+  }
+
+  <table class="pokemon-table__table">
+    <caption class="visually-hidden">
+      Pokémon. Select a column header to sort; select a row for details.
+    </caption>
+    <colgroup>
+      <col class="pokemon-table__col-sprite" />
+      @for (column of columns; track column.id) {
+        <col [class]="'pokemon-table__col-' + column.id" />
+      }
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">
+          <span class="visually-hidden">Sprite</span>
+        </th>
+        @for (column of columns; track column.id) {
+          <th scope="col" [attr.aria-sort]="ariaSort(column)">
+            @if (column.sortKey; as sortKey) {
+              <button
+                type="button"
+                class="pokemon-table__sort"
+                [class.pokemon-table__sort--active]="sort().key === sortKey"
+                (click)="sortChange.emit(sortKey)"
+              >
+                {{ column.label }}
+                <img
+                  class="pokemon-table__sort-icon"
+                  [class.pokemon-table__sort-icon--asc]="
+                    sort().key === sortKey && sort().direction === 'asc'
+                  "
+                  [src]="
+                    sort().key === sortKey
+                      ? 'assets/icons/ic_dropdown.svg'
+                      : 'assets/icons/ic_sort.svg'
+                  "
+                  width="12"
+                  height="12"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            } @else {
+              {{ column.label }}
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @switch (viewState()) {
+        @case ("loading") {
+          @for (row of skeletonRows(); track row) {
+            <tr class="pokemon-table__row" aria-hidden="true">
+              <td>
+                <app-skeleton width="44px" height="44px" radius="50%" />
+              </td>
+              <td class="pokemon-table__numeric">
+                <app-skeleton width="44px" />
+              </td>
+              <td><app-skeleton width="110px" /></td>
+              <td>
+                <app-skeleton width="128px" height="20px" radius="999px" />
+              </td>
+              @for (stat of statKeys; track stat) {
+                <td class="pokemon-table__numeric">
+                  <app-skeleton width="28px" />
+                </td>
+              }
+              <td class="pokemon-table__numeric">
+                <app-skeleton width="32px" />
+              </td>
+            </tr>
+          }
+        }
+
+        @case ("error") {
+          <tr>
+            <td class="pokemon-table__state-cell" [attr.colspan]="columnCount">
+              <app-error-state
+                title="Couldn't load the Pokédex"
+                [message]="errorMessage() ?? ''"
+                (retry)="retry.emit()"
+              />
+            </td>
+          </tr>
+        }
+
+        @case ("empty") {
+          <tr>
+            <td class="pokemon-table__state-cell" [attr.colspan]="columnCount">
+              <app-empty-state
+                title="No Pokémon found"
+                [message]="emptyMessage()"
+              >
+                @if (hasFilters()) {
+                  <app-custom-button
+                    variant="secondary"
+                    (clicked)="clearFilters.emit()"
+                  >
+                    Clear filters
+                  </app-custom-button>
+                }
+              </app-empty-state>
+            </td>
+          </tr>
+        }
+
+        @case ("success") {
+          @for (entry of pokemon(); track entry.id) {
+            <tr
+              class="pokemon-table__row pokemon-table__row--interactive"
+              [class.pokemon-table__row--selected]="entry.id === selectedId()"
+              tabindex="0"
+              (click)="rowSelect.emit(entry)"
+              (keydown.enter)="onRowKeydown($event, entry)"
+              (keydown.space)="onRowKeydown($event, entry)"
+            >
+              <td>
+                <app-avatar
+                  variant="sprite"
+                  loading="eager"
+                  [imageUrl]="entry.spriteUrl"
+                  [size]="44"
+                  [fallbackInitials]="entry.name.charAt(0).toUpperCase()"
+                />
+              </td>
+              <td class="pokemon-table__numeric pokemon-table__dex">
+                {{ entry.id | dexNumber }}
+              </td>
+              <td class="pokemon-table__name">
+                {{ entry.name | pokemonName }}
+              </td>
+              <td>
+                <div class="pokemon-table__types">
+                  @for (type of entry.types; track type) {
+                    <app-type-badge [type]="type" />
+                  }
+                </div>
+              </td>
+              @for (stat of statKeys; track stat) {
+                <td class="pokemon-table__numeric">{{ entry.stats[stat] }}</td>
+              }
+              <td class="pokemon-table__numeric pokemon-table__total">
+                {{ entry.total }}
+              </td>
+            </tr>
+          }
+        }
+      }
+    </tbody>
+  </table>
+</div>

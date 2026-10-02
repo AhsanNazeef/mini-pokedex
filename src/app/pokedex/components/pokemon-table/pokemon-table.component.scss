@@ -1,0 +1,149 @@
+@use "../../../common/styles/shared" as *;
+
+.pokemon-table {
+  @include custom-scrollbar;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+
+  &__table {
+    width: 100%;
+    min-width: 880px;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  // Fixed widths for text columns so loading, error, empty and loaded
+  // states share the same column positions (no horizontal jump).
+  &__col-sprite {
+    width: 68px;
+  }
+
+  &__col-id {
+    width: 84px;
+  }
+
+  &__col-name {
+    width: 170px;
+  }
+
+  &__col-types {
+    width: 180px;
+  }
+
+  th {
+    padding: 0 12px;
+    height: 44px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0 12px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  &__row {
+    height: 56px;
+
+    &--interactive {
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: -2px;
+      }
+    }
+
+    &--selected,
+    &--selected:hover {
+      background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    }
+  }
+
+  // Every column is left-aligned; fixed-width digits keep numbers comparable.
+  &__numeric {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__dex {
+    color: var(--color-text-muted);
+  }
+
+  &__name {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__types {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__total {
+    font-weight: 700;
+  }
+
+  &__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &--active {
+      color: var(--color-text);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+
+  // Faint up/down icon marks every sortable column; the sorted one is solid.
+  &__sort-icon {
+    opacity: 0.35;
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+
+    &--asc {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__sort:hover &__sort-icon {
+    opacity: 0.7;
+  }
+
+  &__sort--active &__sort-icon {
+    opacity: 1;
+  }
+
+  &__state-cell {
+    padding: 0;
+  }
+}

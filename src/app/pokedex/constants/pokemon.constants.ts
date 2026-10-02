@@ -22,6 +22,16 @@ export const STAT_KEYS: readonly StatKey[] = [
   "speed",
 ];
 
+// Column labels as named in the task: HP, Attack, Defense, Sp.Atk, Sp.Def, Speed
+export const STAT_LABELS: Readonly<Record<StatKey, string>> = {
+  hp: "HP",
+  attack: "Attack",
+  defense: "Defense",
+  specialAttack: "Sp.Atk",
+  specialDefense: "Sp.Def",
+  speed: "Speed",
+};
+
 // PokéAPI stat names → StatKey
 export const API_STAT_KEYS: Readonly<Record<string, StatKey>> = {
   hp: "hp",
