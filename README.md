@@ -8,23 +8,13 @@ teams are stored in a local mock GraphQL server.
 
 - **Pokédex table** — sprite, name, type badges and all six base stats plus total; sortable by
   any stat, client-side pagination (10 / 25 / 50), debounced name search and a type filter
-- **Detail panel** — slide-in panel with abilities and an animated radar chart of base stats
-- **Team builder** — reactive form with an async unique-name check, a debounced Pokémon
-  autocomplete and removable chips (1–6 Pokémon)
-- **Teams** — create and delete teams with optimistic updates and rollback on failure
+- **Detail panel** — slide-in panel with abilities and a radar chart of base stats that
+  animates from one Pokémon to the next
+- **Team builder** — reactive form in a modal, with a debounced async unique-name check and a
+  Pokémon autocomplete whose chips are removable (1–6 Pokémon)
+- **Teams** — create and delete with optimistic updates, rollback and an error toast; the
+  active team is remembered across reloads
 - **Resilient UI** — every async view has loading, empty, error (with retry) and success states
-
-## Status
-
-Work in progress. This section is updated as features land.
-
-- [x] Angular 21 workspace (standalone, zoneless, Vitest, SCSS)
-- [x] Tooling: commitlint, husky, ESLint
-- [x] Mock GraphQL server
-- [x] Pokédex table and detail panel
-- [x] Team store and team list
-- [x] Team builder form
-- [x] Unit tests (store rollback, selector/computed, form validator)
 
 ## Tech stack
 
@@ -86,6 +76,72 @@ Then open <http://localhost:4200>. Pokémon data needs internet access to reach 
 The Angular CLI is installed locally, so use `npx ng <command>` (or the scripts above) rather
 than a global `ng`.
 
+## Architecture
+
+### Layers
+
+Data flows one way: **service → store → selectors → component**.
+
+```
+src/app/
+├── core/       # App-wide singletons: GraphQL client, logger
+├── common/     # Shared components, constants, models, pipes, services, utils, styles
+├── pokedex/    # Pokédex page, table, detail panel and state/ (store + selectors)
+└── teams/      # Teams page, team builder form, validators and state/ (team store)
+```
+
+- **Services** own the GraphQL documents and map raw responses to domain models. They return
+  cold observables and never touch state.
+- **Stores** (`pokemon.store.ts`, `team.store.ts`) hold a single `BehaviorSubject` of
+  immutable state and expose it read-only. All mutations go through methods.
+- **Selectors** derive everything the UI needs with `map`, `distinctUntilChanged`,
+  `combineLatest` and `shareReplay(1)` — filtering, sorting and paging are pure functions,
+  which keeps them easy to test.
+- **Components** are standalone and `OnPush`, bridge selectors in with `toSignal()`, and use
+  `signal()` only for their own UI state. Subscriptions use `takeUntilDestroyed()`.
+
+### Fetching and caching
+
+One `GraphqlClientService` serves both endpoints. The whole Pokédex (1025 Pokémon) is fetched
+in a single request and cached in the store, so search, sorting, paging, the team cards and
+the autocomplete all read from memory with no further requests. Only the sprite URL is
+requested rather than the full `sprites` object, which keeps that response around 39 KB
+gzipped instead of about 14 MB of JSON.
+
+Per-Pokémon details (stats and abilities) are fetched on demand and cached by id.
+
+### Errors and the four UI states
+
+Every failure is normalised into an `ApiError` carrying a `kind`, a `userMessage` safe to
+display, and `isRetryable`. GraphQL servers report failures with HTTP 200 and an `errors`
+array, so the client treats that as a failure too. PokéAPI calls retry twice with a growing
+delay (1s, then 2s); mutations deliberately do not, since retrying an ambiguous create could
+produce duplicate teams. Requests time out after 30 seconds.
+
+Each async view therefore renders one of four states — loading, empty, error with a working
+retry, or success — from shared `skeleton`, `empty-state` and `error-state` components.
+
+### Optimistic updates
+
+Creating a team inserts it immediately with a temporary id; the server's copy replaces it on
+success. On failure the row is removed and a toast explains why. Deleting works the same way
+in reverse. Rollback is covered by unit tests and was verified in the browser with the
+network cut.
+
+## Testing
+
+```bash
+npm test
+```
+
+112 unit tests across 22 files, including the three the brief asks for:
+
+| Required test  | File                                                         |
+| -------------- | ------------------------------------------------------------ |
+| Store method   | `teams/state/team.store.spec.ts` — optimistic rollback       |
+| Selector       | `pokedex/state/pokemon.selectors.spec.ts` — filter/sort/page |
+| Form validator | `teams/validators/unique-team-name.validator.spec.ts`        |
+
 ## Commit messages
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/) and are checked by
@@ -100,12 +156,22 @@ commitlint in a husky `commit-msg` hook (installed automatically by `npm install
 - **Subject:** lowercase, imperative mood ("add", not "added"), no trailing period, header
   ≤ 100 characters
 
-## Project structure
+## What I'd improve with more time
 
-```
-src/app/
-├── core/       # App-wide singletons: GraphQL client, logger
-├── common/     # Shared components, constants, models, pipes, services, utils, styles
-├── pokedex/    # Pokédex page, table, detail panel and state/ (store + selectors)
-└── teams/      # Teams page, team builder form, validators and state/ (team store)
-```
+- **Virtual scrolling for the table.** Caching the full Pokédex makes filtering instant, but
+  50 rows per page is the practical ceiling for the DOM. `@angular/cdk` virtual scroll would
+  let the table show everything without pagination.
+- **Load ECharts lazily.** It is registered eagerly to match the developer guide, which puts
+  about 139 KB (gzipped) into the initial bundle for a chart only the detail panel uses, and
+  is why the production build budget is set to 850 kB rather than Angular's default 500 kB.
+  Loading it with the panel would roughly halve the first download.
+- **Trainer support.** `db.js` seeds two trainers, but the app writes every new team to
+  trainer 1. A trainer switcher, and filtering teams by trainer, is the obvious next step.
+- **Editing teams.** Only create and delete exist today; renaming a team or swapping a
+  Pokémon means deleting and rebuilding it.
+- **End-to-end tests.** The flows in this app were verified by driving a real browser during
+  development; those checks belong in a committed Playwright suite rather than in my notes.
+- **Reconciling concurrent edits.** The mock server has no subscriptions, so two tabs can
+  drift apart. Refetching after a mutation, or polling, would keep them honest.
+- **A real accessibility pass.** Roles, focus management and keyboard paths were built in and
+  spot-checked, but the app has not been tested with an actual screen reader.
