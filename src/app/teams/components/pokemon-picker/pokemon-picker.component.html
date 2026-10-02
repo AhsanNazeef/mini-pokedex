@@ -1,0 +1,158 @@
+<div class="pokemon-picker">
+  @if (selected().length) {
+    <ul class="pokemon-picker__chips">
+      @for (pokemon of selected(); track pokemon.id) {
+        <li class="pokemon-picker__chip">
+          <app-avatar
+            variant="sprite"
+            [imageUrl]="pokemon.spriteUrl"
+            [size]="28"
+            [fallbackInitials]="'#' + pokemon.id"
+          />
+          <span class="pokemon-picker__chip-name">{{ label(pokemon) }}</span>
+          <button
+            type="button"
+            class="pokemon-picker__chip-remove"
+            [attr.aria-label]="'Remove ' + label(pokemon)"
+            (click)="remove(pokemon.id)"
+          >
+            <img
+              src="assets/icons/ic_close.svg"
+              width="12"
+              height="12"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="pokemon-picker__field" #field>
+    <img
+      class="pokemon-picker__search-icon"
+      src="assets/icons/ic_search.svg"
+      width="16"
+      height="16"
+      alt=""
+      aria-hidden="true"
+    />
+    <input
+      #searchField
+      type="text"
+      role="combobox"
+      autocomplete="off"
+      class="pokemon-picker__input"
+      [id]="inputId()"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="listboxId()"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="invalid() || null"
+      [attr.aria-activedescendant]="
+        isOpen() && dropdownState() === 'results'
+          ? optionId(activeIndex())
+          : null
+      "
+      [placeholder]="
+        isFull()
+          ? 'Team is full — remove one to swap'
+          : 'Search ' + pokedexSize + ' Pokémon by name'
+      "
+      [attr.readonly]="isFull() ? '' : null"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (keydown)="onKeydown($event)"
+    />
+  </div>
+
+  @if (isOpen() && !isFull() && dropdownPosition(); as position) {
+    <div
+      #dropdown
+      class="pokemon-picker__dropdown"
+      [style.top.px]="position.top"
+      [style.left.px]="position.left"
+      [style.width.px]="position.width"
+      [style.max-height.px]="position.maxHeight"
+    >
+      @switch (dropdownState()) {
+        @case ("loading") {
+          <p class="visually-hidden" role="status">Loading Pokémon…</p>
+          <ul class="pokemon-picker__options" aria-hidden="true">
+            @for (row of skeletonRows; track row) {
+              <li class="pokemon-picker__option">
+                <app-skeleton width="28px" height="28px" radius="50%" />
+                <app-skeleton width="120px" />
+              </li>
+            }
+          </ul>
+        }
+
+        @case ("error") {
+          <app-error-state
+            [compact]="true"
+            [message]="errorMessage()"
+            (retry)="retryPokedex()"
+          />
+        }
+
+        @case ("empty") {
+          <app-empty-state
+            [title]="emptyMessage()"
+            [compact]="true"
+            icon="search"
+          />
+        }
+
+        @case ("results") {
+          <!-- Options are not focusable: focus stays in the input and
+               aria-activedescendant points at the highlighted row. -->
+          <ul
+            class="pokemon-picker__options"
+            role="listbox"
+            tabindex="-1"
+            [id]="listboxId()"
+            aria-label="Pokémon suggestions"
+            (mousedown)="$event.preventDefault()"
+            (click)="onListboxClick($event)"
+            (mousemove)="onListboxPointerMove($event)"
+            (keydown)="onKeydown($event)"
+          >
+            @for (pokemon of results(); track pokemon.id; let index = $index) {
+              <li
+                class="pokemon-picker__option"
+                role="option"
+                [id]="optionId(index)"
+                [attr.aria-selected]="index === activeIndex()"
+                [class.pokemon-picker__option--active]="index === activeIndex()"
+                [attr.data-index]="index"
+              >
+                <app-avatar
+                  variant="sprite"
+                  [imageUrl]="pokemon.spriteUrl"
+                  [size]="28"
+                  [fallbackInitials]="'#' + pokemon.id"
+                />
+                <span class="pokemon-picker__option-name">
+                  {{ label(pokemon) }}
+                </span>
+                <span class="pokemon-picker__option-total">
+                  {{ pokemon.total }}
+                </span>
+              </li>
+            }
+          </ul>
+
+          <!-- Invisible marker: scrolling it into view renders the next batch. -->
+          @if (hasMore()) {
+            <div
+              #scrollAnchor
+              class="pokemon-picker__sentinel"
+              aria-hidden="true"
+            ></div>
+          }
+        }
+      }
+    </div>
+  }
+</div>

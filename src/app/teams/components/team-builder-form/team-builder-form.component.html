@@ -1,0 +1,66 @@
+<form class="team-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="team-form__field">
+    <label class="team-form__label" for="team-name">Team name</label>
+    <div class="team-form__input-wrap">
+      <input
+        id="team-name"
+        type="text"
+        class="team-form__input"
+        formControlName="name"
+        autocomplete="off"
+        [attr.maxlength]="maxNameLength"
+        [attr.aria-invalid]="nameError() ? true : null"
+        [attr.aria-describedby]="nameError() ? 'team-name-error' : null"
+        placeholder="e.g. Kanto Starters"
+      />
+      @if (isCheckingName()) {
+        <span class="team-form__spinner" aria-hidden="true"></span>
+      }
+    </div>
+    <p class="team-form__hint">
+      {{ minNameLength }}–{{ maxNameLength }} characters, and not already used.
+    </p>
+    @if (nameError(); as message) {
+      <p class="team-form__error" id="team-name-error" role="alert">
+        {{ message }}
+      </p>
+    }
+  </div>
+
+  <div class="team-form__field">
+    <label class="team-form__label" for="team-pokemon">
+      Pokémon
+      <span class="team-form__count">
+        {{ selectedIds().length }} / {{ maxPokemon }}
+      </span>
+    </label>
+    <app-pokemon-picker
+      inputId="team-pokemon"
+      [selectedIds]="selectedIds()"
+      [maxSelection]="maxPokemon"
+      [invalid]="!!pokemonError()"
+      [describedBy]="
+        pokemonError() ? 'team-pokemon-error' : 'team-pokemon-hint'
+      "
+      (selectionChange)="onSelectionChange($event)"
+      (touched)="onPickerTouched()"
+    />
+    <p class="team-form__hint" id="team-pokemon-hint">
+      Pick {{ minPokemon }}–{{ maxPokemon }}. Type to search, Enter to add.
+    </p>
+    @if (pokemonError(); as message) {
+      <p class="team-form__error" id="team-pokemon-error" role="alert">
+        {{ message }}
+      </p>
+    }
+  </div>
+
+  <div class="team-form__actions">
+    <app-custom-button variant="secondary" (clicked)="cancel()">
+      Cancel
+    </app-custom-button>
+    <app-custom-button type="submit" [isLoading]="isCheckingName()">
+      Create team
+    </app-custom-button>
+  </div>
+</form>

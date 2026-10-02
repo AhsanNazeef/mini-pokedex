@@ -1,0 +1,139 @@
+@use "../../../common/styles/shared" as *;
+
+.pokemon-picker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 4px 3px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    font-size: 0.8125rem;
+  }
+
+  &__chip-name {
+    font-weight: 600;
+  }
+
+  &__chip-remove {
+    display: inline-flex;
+    padding: 3px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+    }
+  }
+
+  &__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    pointer-events: none;
+  }
+
+  &__input {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--color-danger);
+    }
+  }
+
+  // Fixed, and placed from script against the input: overlaying keeps the
+  // dialog a constant size, and no scrolling ancestor can clip it.
+  &__dropdown {
+    @include custom-scrollbar;
+    position: fixed;
+    z-index: 20;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  &__options {
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  &__option-name {
+    font-weight: 600;
+  }
+
+  &__sentinel {
+    height: 1px;
+  }
+
+  &__option-total {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
