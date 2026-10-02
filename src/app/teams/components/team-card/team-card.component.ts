@@ -31,7 +31,10 @@ export class TeamCardComponent {
   readonly members = input.required<readonly TeamMember[]>();
   /** True while this team's create or delete is still in flight. */
   readonly pending = input(false);
+  /** Marks this as the trainer's active team. */
+  readonly selected = input(false);
   readonly deleteTeam = output<string>();
+  readonly selectToggle = output<string>();
 
   /** Combined base-stat total, counting only members already in the cache. */
   readonly totalStats = computed(() =>

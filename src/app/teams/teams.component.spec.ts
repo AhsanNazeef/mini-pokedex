@@ -165,6 +165,55 @@ describe("TeamsPage", () => {
     expect(element.textContent).toContain("Kanto Starters");
   });
 
+  describe("active team", () => {
+    const toggle = () =>
+      element.querySelector<HTMLButtonElement>(".team-card__select");
+
+    it("remembers the active team across visits", async () => {
+      await render();
+      expect(toggle()?.textContent?.trim()).toBe("Set active");
+
+      toggle()?.click();
+      await fixture.whenStable();
+      expect(toggle()?.textContent?.trim()).toBe("Active");
+      expect(toggle()?.getAttribute("aria-pressed")).toBe("true");
+
+      // A fresh visit restores it from storage.
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          { provide: TeamApiService, useValue: teamApi },
+          { provide: PokemonApiService, useValue: pokemonApi },
+        ],
+      });
+      await render();
+
+      expect(toggle()?.textContent?.trim()).toBe("Active");
+    });
+
+    it("clears the selection when that team no longer exists", async () => {
+      localStorage.setItem(
+        "selectedTeamId",
+        JSON.stringify({ value: "gone-team" }),
+      );
+      await render();
+
+      expect(toggle()?.textContent?.trim()).toBe("Set active");
+      expect(localStorage.getItem("selectedTeamId")).toBeNull();
+    });
+
+    it("unsets the active team when toggled again", async () => {
+      await render();
+      toggle()?.click();
+      await fixture.whenStable();
+      toggle()?.click();
+      await fixture.whenStable();
+
+      expect(toggle()?.textContent?.trim()).toBe("Set active");
+      expect(localStorage.getItem("selectedTeamId")).toBeNull();
+    });
+  });
+
   it("removes a team on delete and restores it with a toast on failure", async () => {
     teamApi.deleteTeam$.mockReturnValue(
       throwError(() => new ApiError("network", "offline")),

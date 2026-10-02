@@ -38,7 +38,9 @@
                 [team]="view.team"
                 [members]="view.members"
                 [pending]="view.pending"
+                [selected]="view.selected"
                 (deleteTeam)="onDeleteTeam($event)"
+                (selectToggle)="onToggleSelected($event)"
               />
             </li>
           }

@@ -16,6 +16,7 @@ import { ModalDialogComponent } from "../common/components/modal-dialog/modal-di
 import { SkeletonComponent } from "../common/components/skeleton/skeleton.component";
 import {
   CacheService,
+  SELECTED_TEAM_CACHE_KEY,
   TEAM_COUNT_CACHE_KEY,
 } from "../common/services/cache.service";
 import { ToastService } from "../common/services/toast.service";
@@ -38,6 +39,7 @@ interface TeamView {
   team: Team;
   members: TeamMember[];
   pending: boolean;
+  selected: boolean;
 }
 
 @Component({
@@ -83,6 +85,11 @@ export class TeamsPage implements OnInit {
   readonly skeletonBadges = [1, 2, 3, 4, 5, 6, 7];
   readonly isFormOpen = signal(false);
 
+  /** The trainer's active team, restored from the last visit. */
+  readonly selectedTeamId = signal<string | null>(
+    this.cache.get<string>(SELECTED_TEAM_CACHE_KEY),
+  );
+
   /**
    * Cards need teams *and* the Pokédex cache, so the page keeps showing
    * skeletons until both arrive — otherwise rows would flash bare ids and
@@ -111,6 +118,7 @@ export class TeamsPage implements OnInit {
   readonly teamViews = computed<TeamView[]>(() => {
     const entities = this.pokemonById();
     const pending = this.pendingIds();
+    const selectedId = this.selectedTeamId();
     return this.teams().map((team) => ({
       team,
       members: team.pokemonIds.map((id) => ({
@@ -118,6 +126,7 @@ export class TeamsPage implements OnInit {
         pokemon: entities[id] ?? null,
       })),
       pending: pending.has(team.id),
+      selected: team.id === selectedId,
     }));
   });
 
@@ -131,6 +140,25 @@ export class TeamsPage implements OnInit {
     effect(() => {
       if (this.teamStatus() !== "success") return;
       this.cache.set(TEAM_COUNT_CACHE_KEY, this.teams().length);
+    });
+
+    // Persist the active team so it survives a reload.
+    effect(() => {
+      const id = this.selectedTeamId();
+      if (id === null) {
+        this.cache.remove(SELECTED_TEAM_CACHE_KEY);
+      } else {
+        this.cache.set(SELECTED_TEAM_CACHE_KEY, id);
+      }
+    });
+
+    // Drop a stored selection whose team is gone (deleted here or elsewhere).
+    effect(() => {
+      if (this.teamStatus() !== "success") return;
+      const id = this.selectedTeamId();
+      if (id !== null && !this.teams().some((team) => team.id === id)) {
+        this.selectedTeamId.set(null);
+      }
     });
   }
 
@@ -154,6 +182,10 @@ export class TeamsPage implements OnInit {
 
   onDeleteTeam(id: string): void {
     this.teamStore.deleteTeam(id);
+  }
+
+  onToggleSelected(id: string): void {
+    this.selectedTeamId.update((current) => (current === id ? null : id));
   }
 
   onCreateTeam(input: CreateTeamInput): void {

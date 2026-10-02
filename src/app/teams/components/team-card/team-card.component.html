@@ -1,5 +1,6 @@
 <article
   class="team-card"
+  [class.team-card--selected]="selected()"
   [class.team-card--pending]="pending()"
   [attr.aria-busy]="pending() || null"
 >
@@ -60,10 +61,25 @@
     }
   </div>
 
-  <p class="team-card__total">
-    @if (totalStats() > 0) {
-      <span class="team-card__total-label">Total stats</span>
-      <span class="team-card__total-value">{{ totalStats() }}</span>
-    }
-  </p>
+  <div class="team-card__summary">
+    <p class="team-card__total">
+      @if (totalStats() > 0) {
+        <span class="team-card__total-label">Total stats</span>
+        <span class="team-card__total-value">{{ totalStats() }}</span>
+      }
+    </p>
+    <button
+      type="button"
+      class="team-card__select"
+      [class.team-card__select--on]="selected()"
+      [attr.aria-pressed]="selected()"
+      [attr.aria-label]="
+        (selected() ? 'Unset ' : 'Set ') + team().name + ' as the active team'
+      "
+      [disabled]="pending()"
+      (click)="selectToggle.emit(team().id)"
+    >
+      {{ selected() ? "Active" : "Set active" }}
+    </button>
+  </div>
 </article>
