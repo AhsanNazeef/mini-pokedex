@@ -1,5 +1,5 @@
 import { Injectable, inject } from "@angular/core";
-import { Observable, map } from "rxjs";
+import { Observable, map, of } from "rxjs";
 import { MOCK_GRAPHQL_URL } from "../../common/constants/api.constants";
 import { ApiError, GraphqlClientService } from "../../core/graphql";
 import { DEFAULT_TRAINER_ID } from "../constants/team.constants";
@@ -29,6 +29,17 @@ const getTeamsQuery = /* GraphQL */ `
   query GetTeams {
     allTeams {
       ${teamFields}
+    }
+  }
+`;
+
+// `q` is the mock server's case-insensitive full-text filter, so this finds
+// near-matches; the exact comparison happens in the service.
+const findTeamsByNameQuery = /* GraphQL */ `
+  query FindTeamsByName($name: String!) {
+    allTeams(filter: { q: $name }) {
+      id
+      name
     }
   }
 `;
@@ -68,6 +79,31 @@ export class TeamApiService {
     return this.graphql
       .request$<{ allTeams: ApiTeam[] }>(MOCK_GRAPHQL_URL, getTeamsQuery)
       .pipe(map((data) => data.allTeams.map(toTeam)));
+  }
+
+  /**
+   * Whether another team already uses this name, ignoring case and outer
+   * spaces. Backs the form's async uniqueness check.
+   * @param name Candidate team name.
+   * @param exceptId Team id to ignore, when renaming an existing team.
+   */
+  isNameTaken$(name: string, exceptId?: string): Observable<boolean> {
+    const needle = name.trim().toLowerCase();
+    if (!needle) return of(false);
+    return this.graphql
+      .request$<{ allTeams: { id: string; name: string }[] }>(
+        MOCK_GRAPHQL_URL,
+        findTeamsByNameQuery,
+        { name: needle },
+      )
+      .pipe(
+        map((data) =>
+          data.allTeams.some(
+            (team) =>
+              team.id !== exceptId && team.name.trim().toLowerCase() === needle,
+          ),
+        ),
+      );
   }
 
   /**
