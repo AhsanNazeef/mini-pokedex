@@ -69,8 +69,13 @@ export class TeamStore {
     shareReplay(1),
   );
 
+  /** Load state of the team list, for the page's four UI states. */
   readonly status$ = this.select((state) => state.status);
+
+  /** User-facing message for a failed load, or `null`. */
   readonly error$ = this.select((state) => state.error);
+
+  /** Ids with a create or delete still in flight, so rows can show as busy. */
   readonly pendingIds$ = this.select((state) => state.pendingIds);
 
   constructor() {
