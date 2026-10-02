@@ -1,0 +1,17 @@
+<div class="error-state" [class.error-state--compact]="compact()" role="alert">
+  @if (!compact()) {
+    <img
+      class="error-state__icon"
+      src="assets/icons/ic_alert.svg"
+      width="32"
+      height="32"
+      alt=""
+      aria-hidden="true"
+    />
+    <p class="error-state__title">{{ title() }}</p>
+  }
+  <p class="error-state__message">{{ message() }}</p>
+  <app-custom-button variant="secondary" (clicked)="retry.emit()">
+    Retry
+  </app-custom-button>
+</div>

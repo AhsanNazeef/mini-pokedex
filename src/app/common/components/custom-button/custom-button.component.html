@@ -1,0 +1,13 @@
+<button
+  class="custom-button"
+  [class.custom-button--secondary]="variant() === 'secondary'"
+  [type]="type()"
+  [disabled]="disabled() || isLoading()"
+  [attr.aria-busy]="isLoading() || null"
+  (click)="onClick()"
+>
+  @if (isLoading()) {
+    <span class="custom-button__spinner" aria-hidden="true"></span>
+  }
+  <ng-content />
+</button>

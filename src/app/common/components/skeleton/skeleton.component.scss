@@ -1,0 +1,10 @@
+@use "../../styles/shared" as *;
+
+:host {
+  display: block;
+}
+
+.skeleton {
+  @extend %sk-shimmer;
+  display: block;
+}
